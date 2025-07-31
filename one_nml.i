@@ -42,7 +42,7 @@ c-----from namelist /numercl/
      &            eps_delta_pow,
 c-----namelist /output/
 c-----namelist /plasma/
-     &            temp_scale,den_scale,ifsd,
+     &            temp_scale,den_scale,ifsd,Lambda1,Lambda2,
 c-----namelist /species/
 c-----from namelist /varden/
      &            var0,denn,denm,an,sigman,
@@ -181,7 +181,8 @@ c-----from namelist /numercl/
      &            eps_delta_pow,
 c-----namelist /output/
 c-----namelist /plasma/
-     &            temp_scale(nbulka),den_scale(nbulka),ifsd(nbulka),
+     &            temp_scale(nbulka),den_scale(nbulka),
+     &            ifsd(nbulka),Lambda1(nbulka),Lambda2(nbulka),
 c-----namelist /species/
 c-----from namelist /varden/
      &            var0,denn,denm,an,sigman,

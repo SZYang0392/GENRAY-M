@@ -2132,7 +2132,7 @@ c      if (is.gt.1) write(*,*)'wdnpar_nc(is-1,iray)',wdnpar_nc(is-1,iray)
       cnprim_e=0.d0
 
 c      call absorplh(u,cnpar,cnper,temp_e,dens_e,tempiar
-c     1                  ,ifsd,bz,br,bphi,nbulk,bmod,frqncy,z_eff,
+c     1                  ,ifsd,Lambda1,Lambda2,bz,br,bphi,nbulk,bmod,frqncy,z_eff,
 c     1                   cnprim_e,cnprim_i,cnprim_cl,cnprim_s)
 c      write(*,*)'LH iabsorp_2 cnprim_e', cnprim_e
 

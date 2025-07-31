@@ -26,13 +26,14 @@ c                           cnprim_cl-imagionary part of N_perp	  *
 c                                collisional(ions and electron)	  *
 c-----------------------------------------------------------------*
       subroutine absorplh(u,cnpar,cnper,tempe,dense,tempiar
-     1 ,ifsd,b_z,b_r,b_phi,nbulk,bmod,frqncy,zeff,
+     1 ,ifsd,Lambda1,Lambda2,b_z,b_r,b_phi,nbulk,bmod,frqncy,zeff,
      1 cnprim_e,cnprim_i,cnprim_cl,cnprim_s)
       implicit integer (i-n), real*8 (a-h,o-z)
       include 'param.i'
       include 'ions.i'
       dimension u(6),deruu(6)
-      dimension tempiar(nbulka),ifsd(nbulka)
+      dimension tempiar(nbulka)
+      dimension ifsd(nbulka),Lambda1(nbulka),Lambda2(nbulka)
       dimension cnprim_s(nbulka),di_is(nbulka)
 ********************************************************************
 c electron absorption (Landau damping, formula (21a) in the Bonoli article)
@@ -149,11 +150,17 @@ c        write(*,*)'absorplh.f,pdi_i,sum',pdi_i,sum
                   x_uc = vc/vi
                   x_uc3 = x_uc*x_uc*x_uc
                   xi=x(z,r,phi,i)
+                  fac = 1.5d0*pi/dlog(1+1/x_uc3)
                   psum = x_oi3*(1/(x_oi3+x_uc3)-1/(1+x_uc3))
-                  psum = psum*1.5d0*pi/dlog(1+1/x_uc3)
-                  psum = psum*cnper4*xi
-                  di_is(i) = psum
-                  di_i = di_i + psum
+                  psum = psum*fac*cnper4*xi*Lambda1(i)
+                  if (abs(Lambda2(i)) > 1.d-10) then
+                        psum1 = 1/x_uc3*dlog((1 + x_uc3/x_oi3)/(1 + x_uc3))
+                        psum1 = psum1*fac*cnper4*xi*Lambda2(i)
+                  else
+                        psum1 = 0.d0
+                  endif
+                  di_is(i) = psum + psum1
+                  di_i = di_i + psum + psum1
             endif
 30          continue
       enddo
