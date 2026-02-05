@@ -593,20 +593,20 @@ c                write(*,*)'LH maxw cnprim_e', cnprim_e
                 write(*,*)'for absorption calculations'
                 endif ! outprint
                 call absorplh(u,cnpar,cnper,temp_e,dens_e,tempiar
-     1                  ,ifsd,Lambda1,Lambda2,bz,br,bphi,nbulk,bmod,frqncy,z_eff,
+     1                  ,ifsd,gzeta,guc,gImD,bz,br,bphi,nbulk,bmod,frqncy,z_eff,
      1                   cnprim_e,cnprim_i,cnprim_cl,cnprim_s)
                 cnprim_cl=coll_mult*cnprim_cl  !BH191207
               endif
            else ! i.e., i_lsc_approach.ne.1
               call absorplh(u,cnpar,cnper,temp_e,dens_e,tempiar
-     1                  ,ifsd,Lambda1,Lambda2,bz,br,bphi,nbulk,bmod,frqncy,z_eff,
+     1                  ,ifsd,gzeta,guc,gImD,bz,br,bphi,nbulk,bmod,frqncy,z_eff,
      1                   cnprim_e,cnprim_i,cnprim_cl,cnprim_s)
               cnprim_cl=coll_mult*cnprim_cl  !BH191207
 cyup              write(*,*)'LH iabsorp_2 cnprim_e', cnprim_e
            endif  ! On i_lsc_approach.eq.1
 
 c           call absorplh(u,cnpar,cnper,temp_e,dens_e,tempiar
-c     1                  ,ifsd,Lambda1,Lambda2,bz,br,bphi,nbulk,bmod,frqncy,z_eff,
+c     1                  ,ifsd,gzeta,guc,gImD,bz,br,bphi,nbulk,bmod,frqncy,z_eff,
 c     1                   cnprim_e,cnprim_i,cnprim_cl,cnprim_s)
 	endif !iabsorp=2
 

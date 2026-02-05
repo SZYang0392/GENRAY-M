@@ -26,14 +26,14 @@ c                           cnprim_cl-imagionary part of N_perp	  *
 c                                collisional(ions and electron)	  *
 c-----------------------------------------------------------------*
       subroutine absorplh(u,cnpar,cnper,tempe,dense,tempiar
-     1 ,ifsd,Lambda1,Lambda2,b_z,b_r,b_phi,nbulk,bmod,frqncy,zeff,
+     1 ,ifsd,gzeta,guc,gImD,b_z,b_r,b_phi,nbulk,bmod,frqncy,zeff,
      1 cnprim_e,cnprim_i,cnprim_cl,cnprim_s)
       implicit integer (i-n), real*8 (a-h,o-z)
       include 'param.i'
       include 'ions.i'
       dimension u(6),deruu(6)
       dimension tempiar(nbulka)
-      dimension ifsd(nbulka),Lambda1(nbulka),Lambda2(nbulka)
+      real*8 ifsd(nbulka),gzeta(nbulka),guc(nbulka),gImD(nbulka)
       dimension cnprim_s(nbulka),di_is(nbulka)
 ********************************************************************
 c electron absorption (Landau damping, formula (21a) in the Bonoli article)
@@ -62,9 +62,9 @@ c     ve=(sqrt(Te/me)),    ve in (cm/sec),Te(keV)
       sqrt2=dsqrt(2.d0)
 c----------------------------------------
 c     x_oe=omega/((sqrt(2))*k_par*ve)=cvac/(sqrt(2)*N_par*ve)
-      x_oe=cvac/(sqrt2*cnpar*ve)
+      x_oe=dabs(cvac/(sqrt2*cnpar*ve))
       x_oe2=x_oe*x_oe
-      x_oe3=x_oe2*dabs(x_oe)
+      x_oe3=x_oe2*x_oe
       ye=y(z,r,phi,1)
       xe=x(z,r,phi,1)
 c--------------------------------------
@@ -90,9 +90,9 @@ c-------vi=(sqrt(Ti/mi)),    vi in (cm/sec),Ti(keV)
                   vi=1.87d9*dsqrt(0.5d0*tempi/dmas(i))
                   
 c-------x_oi=omega/((sqrt(2))*k_par*vi)=cvac/(sqrt(2)*N_par*vi)
-                  x_oi=cvac/(sqrt2*cnper*vi)
+                  x_oi=dabs(cvac/(sqrt2*cnper*vi))
                   x_oi2=x_oi*x_oi
-                  x_oi3=x_oi2*dabs(x_oi)
+                  x_oi3=x_oi2*x_oi
                   x_oi4=x_oi2*x_oi2
                   yi=y(z,r,phi,i) ! yi = omega_cyclotron_i/omega
                   xi=x(z,r,phi,i) ! xi = (omega_pl_i/omega)**2
@@ -138,29 +138,34 @@ c        write(*,*)'absorplh.f,pdi_i,sum',pdi_i,sum
       enddo !i
 
       vc = 0.75d0*spi*vc/xe
-      vc3 = vc*ve*ve*ve
+      vc3 = (ve*dsqrt(2.d0))**3*vc
       vc = vc3**(1.d0/3.d0)
       do i=2,nbulk
             if (ifsd(i) >= 0.5d0) then
+                  ! Calculate w/k_perp/v_0 and v_c/v_0
                   tempi = tempiar(i)
-                  vi = 1.87d9*dsqrt(0.5d0*tempi/dmas(i))
-                  x_oi = cvac/(cnper*vi)
+                  vi = 1.87d9*dsqrt(tempi/dmas(i))
+                  x_oi = dabs(cvac/(cnper*vi))
                   if (x_oi > 1.d0) goto 30
-                  x_oi3 = x_oi*x_oi*x_oi
                   x_uc = vc/vi
+                  ! Check unisotropic distribution
+                  if (abs(gImD(i) - 1.d0) > 1.d-5) then
+                        x_oi = x_oi*gzeta(i)
+                        x_uc = x_uc*guc(i)
+                  endif
+                  ! Calculate ImD
+                  x_oi3 = x_oi*x_oi*x_oi
                   x_uc3 = x_uc*x_uc*x_uc
                   xi=x(z,r,phi,i)
                   fac = 1.5d0*pi/dlog(1+1/x_uc3)
                   psum = x_oi3*(1/(x_oi3+x_uc3)-1/(1+x_uc3))
-                  psum = psum*fac*cnper4*xi*Lambda1(i)
-                  if (abs(Lambda2(i)) > 1.d-10) then
-                        psum1 = 1/x_uc3*dlog((1 + x_uc3/x_oi3)/(1 + x_uc3))
-                        psum1 = psum1*fac*cnper4*xi*Lambda2(i)
-                  else
-                        psum1 = 0.d0
+                  psum = psum*fac*cnper4*xi*gzeta(i)
+                  ! Accumulate ImD of ions
+                  if (abs(gImD(i) - 1.d0) > 1.d-5) then
+                        psum = psum*gImD(i)
                   endif
-                  di_is(i) = psum + psum1
-                  di_i = di_i + psum + psum1
+                  di_is(i) = psum
+                  di_i = di_i + psum
             endif
 30          continue
       enddo

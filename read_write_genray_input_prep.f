@@ -5283,8 +5283,9 @@ c&plasma
          temp_scale(i)=1.d0
          den_scale(i)=1.d0
          ifsd(i)=0.d0
-         Lambda1(i)=1.d0
-         Lambda2(i)=0.d0
+         gzeta(i)=1.d0
+         guc(i)=1.d0
+         gImD(i)=1.d0
       enddo
       ndens=ndensa
       nonuniform_profile_mesh='disabled'
