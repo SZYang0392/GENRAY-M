@@ -144,6 +144,7 @@ cSm070718      dimension u(6),deru(6),aux(8,6)
      +i_bad_initial_conditions,n,
      +nrayelt_o_cutoff_emis,n0,igenray,
      +i_geom_optic_loc
+      integer iintgr_err_nc(nraya,nfreqa)
 
 c-----externals
       external outpt
@@ -1181,6 +1182,11 @@ c      enddo
 
       i_total_bad_initial_conditions=0
       power_launched=0.d0
+      do i=1,nraya
+         do j=1,nfreqa
+            iintgr_err_nc(i,j)=0
+         enddo
+      enddo
 
 CMPIINSERTPOSITION BARRIER
       if(myrank.eq.0) then  ! MPI
@@ -1250,6 +1256,7 @@ CMPIINSERTPOSITION DETERMINERANK
      +              iray,ifreq,nray,myrank
        
       ifreq_write=ifreq ! to set in write.i
+      iintgr_err_one_ray=0
 
 CWRITE       write(*,*)'genray.f ifreq_write',ifreq_write
 
@@ -1683,6 +1690,7 @@ c--------------------------------------------------------------
       else 
       iray_status_nc(iray,ifreq)=iray_status_one_ray
       endif  !i_bad_initial_conditions 
+      iintgr_err_nc(iray,ifreq)=iintgr_err_one_ray
       
 CMPIINSERTPOSITION SENDCONFIRM
 cyup Very important! The data for a given ray (rank) is recorded.
@@ -1933,6 +1941,16 @@ c--------------------------------------------------------------------
          do ifreq=1,nfreq
             WRITE(*,*)'iray,ifreq,iray_status_nc(iray,ifreq)',
      +                 iray,ifreq,iray_status_nc(iray,ifreq)
+         enddo
+         enddo
+c--------------------------------------------------------------------
+c     print out status of absorplh integral convergence
+c--------------------------------------------------------------------
+         WRITE(*,*)'status of absorplh integral convergence'
+         do iray=1,nrayl
+         do ifreq=1,nfreq
+            WRITE(*,*)'iray,ifreq,iintgr_err_nc(iray,ifreq)',
+     +                 iray,ifreq,iintgr_err_nc(iray,ifreq)
          enddo
          enddo
 c-----------------------------------------------------------

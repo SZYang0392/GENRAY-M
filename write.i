@@ -93,7 +93,7 @@ c-----data to plot delta power_e and delta current along the ray
       integer       w_ires  
 
       integer       nrayelt,nrayelt_emis,ifreq0,i_ox_conversion,
-     +              ifreq_write,iray_status_one_ray
+     +              ifreq_write,iintgr_err_one_ray,iray_status_one_ray
 
 cBH130508:      real*8, pointer ::
 cBH130508:c-----data for the emission calculations     
@@ -158,6 +158,7 @@ c***********************************************************************
      +             ifreq0,    
      &             i_ox_conversion,    
      &             ifreq_write,
+     &             iintgr_err_one_ray,
      &             iray_status_one_ray,     
      &             w_ires(nrelta, n_relt_harm1a:n_relt_harm2a)
                         ! nrelta*(n_relt_harm2a-n_relt_harm1a+1)

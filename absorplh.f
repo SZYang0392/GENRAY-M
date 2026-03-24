@@ -317,18 +317,20 @@ cSZYang0392 2026.3.21
      & uc3,nharm,Y,L0,DL,bpar,bper,Xres,Yres)
       implicit none
       include 'param.i'
+      include 'write.i'
       integer nharm,i,mn,mnpar
       real*8 uper(nuperint),Xint(nuperint),Yint(nuperint)
       real*8 unpar, uc3, Y, L0, DL, bpar, bper
       real*8 a,b,Xa,Xb,Ya,Yb,h,H0x,H0y
       real*8 Snx,Sny,S2nx,S2ny,Hnx,Hny,H2nx,H2ny,Rnx,Rny
-      real*8 Abstol,Reltol
+      real*8 Reltol
       real*8 Xres,Yres
       logical ifOKx,ifOKy
 
-      ! Set the maximum error
-      Abstol = 5.e-3
+      ! Set the relative error
       Reltol = 5.e-3
+      ifOKx = .false.
+      ifOKy = .false.
 
       ! Integrand value at the start and end points
       a = 0.d0
@@ -411,14 +413,16 @@ cSZYang0392 2026.3.21
             ! Calculate the error and update data
             Rnx = (S2nx - Snx)/15
             Rny = (S2ny - Sny)/15
-            ifOKx = dabs(Rnx).lt.Abstol
-            ifOKx = ifOKx.or.(dabs(Rnx).lt.Reltol*dabs(S2nx))
-            ifOKy = dabs(Rny).lt.Abstol
-            ifOKy = ifOKy.or.(dabs(Rny).lt.Reltol*dabs(S2ny))
+            ifOKx = dabs(Rnx).lt.Reltol*dmax1(dabs(S2nx),1.d-30)
+            ifOKy = dabs(Rny).lt.Reltol*dmax1(dabs(S2ny),1.d-30)
             if (ifOKx.and.ifOKy) exit
             Snx = S2nx
             Sny = S2ny
       end do
+
+      if (.not.(ifOKx.and.ifOKy)) then
+            iintgr_err_one_ray = 1
+      endif
 
       Xres = S2nx
       Yres = S2ny
