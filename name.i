@@ -61,7 +61,7 @@ c----------------------
      &nsteps_freq,n_ec_harmonics_freq,npar_freq
 
       namelist /plasma/ nbulk,izeff,idens,temp_scale,den_scale,ndens,
-     &ifsd,gzeta,guc,gImD,nonuniform_profile_mesh
+     &ifsd,gzeta,guc,gImD,Lambda0,DLambda,nonuniform_profile_mesh
 
       namelist /species/ charge,dmas
 

@@ -86,7 +86,7 @@ c nthinmax=max{i=1,ngrill}nthin(i)
 c nraymaxl is the max number of rays from the grill
 c************************************************************
 c     for common/ions/
-      integer nbulka,nbulkma
+      integer nbulka,nbulkma,nuperint
 c      parameter (nbulka=12)
 c      parameter (nbulka=3)
 c      parameter (nbulka=4)
@@ -95,6 +95,10 @@ cBH111106: For SWIM Plasma State, need nbulka=.ge.8
       parameter (nbulka=8)
 
       parameter (nbulkma=nbulka-1)
+
+c SZYang0392 2026/3/21 : Maximum number of points for the 
+c integration of the Pinch Slowing Down function
+      parameter (nuperint=8000)
 c ncomp=nbulk -the number of plasma species.ge.1 & .le.nbulka
 c************************************************************
 c     for common/loopb/
@@ -161,9 +165,10 @@ c               dielectric tensor calculations  n=<n_relt_harm
 c      parameter (n_relt_harma=3)
 c      parameter (n_relt_harm1a=-3)
 c      parameter (n_relt_harm2a=3)
-      parameter (n_relt_harma=11)
-      parameter (n_relt_harm1a=-5)
-      parameter (n_relt_harm2a=5)
+c SZYang0392 2026/3/22
+      parameter (n_relt_harma=601)
+      parameter (n_relt_harm1a=-300)
+      parameter (n_relt_harm2a=300)
 c************************************************************
 c     for common/scatnper/ (the data for the n_perp scattering )
       integer nscat_n

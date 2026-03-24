@@ -43,6 +43,7 @@ c-----from namelist /numercl/
 c-----namelist /output/
 c-----namelist /plasma/
      &            temp_scale,den_scale,ifsd,gzeta,guc,gImD,
+     &            Lambda0,DLambda,
 c-----namelist /species/
 c-----from namelist /varden/
      &            var0,denn,denm,an,sigman,
@@ -183,6 +184,7 @@ c-----namelist /output/
 c-----namelist /plasma/
      &            temp_scale(nbulka),den_scale(nbulka),
      &            ifsd(nbulka),gzeta(nbulka),guc(nbulka),gImD(nbulka),
+     &            Lambda0(nbulka),DLambda(nbulka),
 c-----namelist /species/
 c-----from namelist /varden/
      &            var0,denn,denm,an,sigman,

@@ -849,8 +849,9 @@
  idswitch = 2
  iabswitch = 1
 ! ======================== For harmonic setting
- n_relt_harm = 5
- n_relt_intgr = 50
+ n_relt_harm1 = 0
+ n_relt_harm = 300
+ n_relt_intgr = 500
 ! ======================== For energy flux calculation
  iflux = 1
 ! ======================== For calculation Im(k_perp) when iabsorp = 4
@@ -1368,9 +1369,11 @@
  nonuniform_profile_mesh = 'disabled'
  den_scale = 1.0  1.0  1.0  1.0  1.0  1.0  1.0
  ifsd = 0.0  0.0  0.0  1.0  0.0  1.0  0.0
- gzeta = 1.0  1.0  1.0  0.865913825883957  1.0  1.0  1.0
- guc =  1.0  1.0  1.0  0.977245970402050  1.0  1.0  1.0
- gImD = 1.0  1.0  1.0  1.021815332681542  1.0  1.0  1.0
+! gzeta = 1.0  1.0  1.0  0.865913825883957  1.0  1.0  1.0
+! guc =  1.0  1.0  1.0  0.977245970402050  1.0  1.0  1.0
+! gImD = 1.0  1.0  1.0  1.021815332681542  1.0  1.0  1.0
+  Lambda0 = 1.0  1.0  1.0  1.0  1.0  1.0  1.0
+  DLambda = 1.0  1.0  1.0  0.2  1.0  0.0  1.0
  /
 
 

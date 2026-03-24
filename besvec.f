@@ -123,7 +123,8 @@ c      parameter (nbesa=201)
 
       nbes=nbesa
       besdel=1.d-4
-      bmaxon=4.d0
+c SZYang0392 2026/3/22 : bmaxon : 4 -> 10 for LHW ion absorption
+      bmaxon=7.d0
       z_abs=dabs(z)
       n_abs=iabs(n)
     

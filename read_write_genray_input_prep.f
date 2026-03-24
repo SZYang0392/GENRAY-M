@@ -5286,6 +5286,8 @@ c&plasma
          gzeta(i)=1.d0
          guc(i)=1.d0
          gImD(i)=1.d0
+         Lambda0(i)=1.d0
+         DLambda(i)=1.d-10
       enddo
       ndens=ndensa
       nonuniform_profile_mesh='disabled'

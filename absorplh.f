@@ -26,15 +26,16 @@ c                           cnprim_cl-imagionary part of N_perp	  *
 c                                collisional(ions and electron)	  *
 c-----------------------------------------------------------------*
       subroutine absorplh(u,cnpar,cnper,tempe,dense,tempiar
-     1 ,ifsd,gzeta,guc,gImD,b_z,b_r,b_phi,nbulk,bmod,frqncy,zeff,
+     1 ,ifsd,Lambda0,DLambda,b_z,b_r,b_phi,nbulk,bmod,frqncy,zeff,
      1 cnprim_e,cnprim_i,cnprim_cl,cnprim_s)
       implicit integer (i-n), real*8 (a-h,o-z)
       include 'param.i'
       include 'ions.i'
       dimension u(6),deruu(6)
       dimension tempiar(nbulka)
-      real*8 ifsd(nbulka),gzeta(nbulka),guc(nbulka),gImD(nbulka)
+      real*8 ifsd(nbulka),Lambda0(nbulka),DLambda(nbulka)
       dimension cnprim_s(nbulka),di_is(nbulka)
+      real*8 BLL,Xresn,Yresn,Xres,Yres
 ********************************************************************
 c electron absorption (Landau damping, formula (21a) in the Bonoli article)
 c Di_e=2*sqrt(pi)*(omegape/omega)**2*(N_par*N_perp)**2*abs(x_oe**3)
@@ -142,28 +143,72 @@ c        write(*,*)'absorplh.f,pdi_i,sum',pdi_i,sum
       vc = vc3**(1.d0/3.d0)
       do i=2,nbulk
             if (ifsd(i) >= 0.5d0) then
+                  ! ! Unmagnetized ImD
+                  ! ! Calculate w/k_perp/v_0 and v_c/v_0
+                  ! tempi = tempiar(i)
+                  ! vi = 1.87d9*dsqrt(tempi/dmas(i))
+                  ! x_oi = dabs(cvac/(cnper*vi))
+                  ! if (x_oi > 1.d0) goto 30
+                  ! x_uc = vc/vi
+                  ! ! Check unisotropic distribution
+                  ! if (abs(gImD(i) - 1.d0) > 1.d-5) then
+                  !       x_oi = x_oi*gzeta(i)
+                  !       x_uc = x_uc*guc(i)
+                  ! endif
+                  ! ! Calculate ImD
+                  ! x_oi3 = x_oi*x_oi*x_oi
+                  ! x_uc3 = x_uc*x_uc*x_uc
+                  ! xi=x(z,r,phi,i)
+                  ! fac = 1.5d0*pi/dlog(1+1/x_uc3)
+                  ! psum = x_oi3*(1/(x_oi3+x_uc3)-1/(1+x_uc3))
+                  ! psum = psum*fac*cnper4*xi*gzeta(i)
+                  ! ! Accumulate ImD of ions
+                  ! if (abs(gImD(i) - 1.d0) > 1.d-5) then
+                  !       psum = psum*gImD(i)
+                  ! endif
+                  ! di_is(i) = psum
+                  ! di_i = di_i + psum
+
+
+
+
+                  ! Calculate pinch angle normalization parameter
+                  if (dabs(DLambda(i)).lt.1.d-5) then
+                        BLL = 2
+                  else
+                        call Pinch_BLL(Lambda0(i),DLambda(i),BLL)
+                  endif
                   ! Calculate w/k_perp/v_0 and v_c/v_0
+                  yi=y(z,r,phi,i)                           ! yi = omega_cyclotron_i/omega
+                  Yharm = 1/yi
+                  xi=x(z,r,phi,i)                           ! xi = (omega_pl_i/omega)**2
                   tempi = tempiar(i)
-                  vi = 1.87d9*dsqrt(tempi/dmas(i))
+                  vi = 1.87d9*dsqrt(tempi/dmas(i))          ! v_0
                   x_oi = dabs(cvac/(cnper*vi))
-                  if (x_oi > 1.d0) goto 30
-                  x_uc = vc/vi
-                  ! Check unisotropic distribution
-                  if (abs(gImD(i) - 1.d0) > 1.d-5) then
-                        x_oi = x_oi*gzeta(i)
-                        x_uc = x_uc*guc(i)
-                  endif
-                  ! Calculate ImD
-                  x_oi3 = x_oi*x_oi*x_oi
+                  x_uc = vc/vi                              ! u_c
                   x_uc3 = x_uc*x_uc*x_uc
-                  xi=x(z,r,phi,i)
-                  fac = 1.5d0*pi/dlog(1+1/x_uc3)
-                  psum = x_oi3*(1/(x_oi3+x_uc3)-1/(1+x_uc3))
-                  psum = psum*fac*cnper4*xi*gzeta(i)
-                  ! Accumulate ImD of ions
-                  if (abs(gImD(i) - 1.d0) > 1.d-5) then
-                        psum = psum*gImD(i)
-                  endif
+                  bpar = dabs(cnpar) * Yharm * vi/cvac      ! k_para*v0/wc
+                  bper = dabs(cnper) * Yharm * vi/cvac      ! k_perp*v0/wc
+                  ! Calculate general parameters
+                  dharmn = Yharm - bpar
+                  iharmn = idint(dharmn)              ! ceil(w-kpar*vpar)/wc
+                  if (dble(iharmn).lt.dharmn) iharmn = iharmn + 1
+                  dharmp = Yharm + bpar
+                  iharmp = idint(dharmp)              ! floor(w+kpar*vpar)/wc
+                  if (dble(iharmp).gt.dharmp) iharmp = iharmp - 1
+                  Xres = 0
+                  Yres = 0
+                  do j=iharmn,iharmp
+                        unpar = (Yharm-j)/dmax1(bpar,1.d-5)
+                        call Pinch_Slowing_Down_Integral(unpar,
+     & x_uc3,j,Yharm,Lambda0(i),DLambda(i),bpar,bper,Xresn,Yresn)
+                        Xres = Xres + Xresn
+                        Yres = Yres + Yresn
+                  enddo
+                  psum = 3*Yharm*Xres + 4*Yres
+                  psum = psum/dmax1(bpar,1.d-5)*x_oi**2
+                  psum = psum*3*pi/dlog(1+1/x_uc3)/BLL
+                  psum = psum*(cnpar2+cnper2)*cnper2*xi
                   di_is(i) = psum
                   di_i = di_i + psum
             endif
@@ -239,6 +284,184 @@ c     1 cnprim_e,cnprim_i,cnprim_cl
       end
 
 
+cSZYang0392 2026.3.21
+! Calculate the pinch-angle normalization factor
+      subroutine Pinch_BLL(L0,DL,BLL)
+      implicit none
+      real*8 L0,DL,pi
+      real*8 h,x,y,BLL
+      integer i,imax
+
+      pi=4.d0*datan(1.d0)
+      h = 0.01
+      imax = dint(pi/h)
+      if (h*dble(imax).gt.pi) imax = imax - 1
+
+      BLL = 0
+      do i=0,imax-1
+            x = i*h
+            y = dexp(-((dsin(x)**2-L0)/DL)**2)*dsin(x)
+            BLL = BLL + y
+      enddo
+      BLL = BLL*h
+      
+      return
+      end
+
+
+
+cSZYang0392 2026.3.21
+! Calculate the integral of pinch angle slowing-down damping
+! with Simpson method
+      subroutine Pinch_Slowing_Down_Integral(unpar,
+     & uc3,nharm,Y,L0,DL,bpar,bper,Xres,Yres)
+      implicit none
+      include 'param.i'
+      integer nharm,i,mn,mnpar
+      real*8 uper(nuperint),Xint(nuperint),Yint(nuperint)
+      real*8 unpar, uc3, Y, L0, DL, bpar, bper
+      real*8 a,b,Xa,Xb,Ya,Yb,h,H0x,H0y
+      real*8 Snx,Sny,S2nx,S2ny,Hnx,Hny,H2nx,H2ny,Rnx,Rny
+      real*8 Abstol,Reltol
+      real*8 Xres,Yres
+      logical ifOKx,ifOKy
+
+      ! Set the maximum error
+      Abstol = 5.e-3
+      Reltol = 5.e-3
+
+      ! Integrand value at the start and end points
+      a = 0.d0
+      b = dsqrt(dmax1(1.d0-unpar**2,0.d0))
+      uper(1) = a
+      call Pinch_Slowing_Down_Integrand(uper(1),1,unpar,uc3,nharm,
+     & Y,L0,DL,bpar,bper,Xint(1),Yint(1))
+      Xa = Xint(1)
+      Ya = Yint(1)
+      uper(1) = b
+      call Pinch_Slowing_Down_Integrand(uper(1),1,unpar,uc3,nharm,
+     & Y,L0,DL,bpar,bper,Xint(1),Yint(1))
+      Xb = Xint(1)
+      Yb = Yint(1)
+
+      ! Initialize the integral
+      mn = 1000
+      mnpar = idint(b*1.0d3)
+      if (mnpar.lt.1) mnpar = 1
+      if (mn>mnpar) mn = mnpar
+      h = (b-a)/2/mn
+      Snx = Xa + Xb
+      Sny = Ya + Yb
+      ! Part 1 : fx_2i
+      do i=1,mn-1
+            uper(i) = a + 2*i*h
+      enddo
+      call Pinch_Slowing_Down_Integrand(uper(1),mn-1,unpar,
+     & uc3,nharm,Y,L0,DL,bpar,bper,Xint(1),Yint(1))
+      do i=1,mn-1
+            Snx = Snx + 2*Xint(i)
+            Sny = Sny + 2*Yint(i)
+      enddo
+      ! Part 2 : fx_{2i+1}
+      do i = 0,mn-1
+            uper(mn+i) = a + (2*i+1)*h
+      enddo
+      call Pinch_Slowing_Down_Integrand(uper(mn),mn,unpar,
+     & uc3,nharm,Y,L0,DL,bpar,bper,Xint(mn),Yint(mn))
+      H0x = 0
+      H0y = 0
+      do i=0,mn-1
+            H0x = H0x + Xint(mn+i)
+            H0y = H0y + Yint(mn+i)
+      enddo
+      Snx = Snx + 4.d0*H0x
+      Sny = Sny + 4.d0*H0y
+      ! Multiply h
+      Snx = Snx * (h/3)
+      Sny = Sny * (h/3)
+      S2nx = Snx
+      S2ny = Sny
+      
+      ! Loop to find the accurate value
+      do while ((4*mn-1) .lt. nuperint)
+            ! Calculate Hnx,Hny
+            Hnx = H0x * (h/3)
+            Hny = H0y * (h/3)
+            ! Set new mesh
+            h = h/2
+            mn = 2*mn
+            do i=0,mn-1
+                  uper(mn+i) = a + (2*i+1)*h
+            enddo
+            ! Calculate H2nx, H2ny
+            call Pinch_Slowing_Down_Integrand(uper(mn),
+     & mn,unpar,uc3,nharm,Y,L0,DL,bpar,bper,
+     & Xint(mn),Yint(mn))
+            H0x = 0
+            H0y = 0
+            do i=0,mn-1
+                  H0x = H0x + Xint(mn+i)
+                  H0y = H0y + Yint(mn+i)
+            enddo
+            H2nx = H0x * (h/3)
+            H2ny = H0y * (h/3)
+            ! Calculate S2nx
+            S2nx = Snx/2 + 4*H2nx - Hnx
+            S2ny = Sny/2 + 4*H2ny - Hny
+            ! Calculate the error and update data
+            Rnx = (S2nx - Snx)/15
+            Rny = (S2ny - Sny)/15
+            ifOKx = dabs(Rnx).lt.Abstol
+            ifOKx = ifOKx.or.(dabs(Rnx).lt.Reltol*dabs(S2nx))
+            ifOKy = dabs(Rny).lt.Abstol
+            ifOKy = ifOKy.or.(dabs(Rny).lt.Reltol*dabs(S2ny))
+            if (ifOKx.and.ifOKy) exit
+            Snx = S2nx
+            Sny = S2ny
+      end do
+
+      Xres = S2nx
+      Yres = S2ny
+
+      return
+      end
+
+
+
+cSZYang0392 2026.3.21
+! Calculate the integrand of pinch angle slowing-down damping
+      subroutine Pinch_Slowing_Down_Integrand(uper,nuper,unpar,
+     & uc3,nharm,Y,L0,DL,bpar,bper,Xint,Yint)
+      implicit none
+      integer nuper, nharm, i
+      real*8 uper(*), Xint(*), Yint(*)
+      real*8 unpar, uc3, Y, L0, DL, bpar, bper
+      real*8 uper2,u2,u,fsd,xpinch1,xpinch2,fpinch,Jnb,Jnbp,fcommon,krho
+
+      do i=1,nuper
+         uper2 = uper(i)**2
+         u2 = uper2 + unpar**2
+         u = dsqrt(u2)
+         fsd = 1/max(u**3 + uc3, 1.d-5)
+         xpinch1 = uper2/max(u2,1.d-5) - L0
+         krho = bper*uper(i)
+         call bes_calc(krho, nharm, Jnb, Jnbp)
+         if (dabs(DL).gt.1.d-5) then
+            xpinch2 = xpinch1/max(dabs(DL),1.d-5)
+            fpinch = exp(-xpinch2**2)
+            fcommon = uper(i)*fsd*fpinch*Jnb**2
+            Yint(i) = fcommon*xpinch2/max(dabs(DL),1.d-5)*unpar
+            Yint(i) = Yint(i)/max(u2**2,1.d-5)
+            Yint(i) = Yint(i)*(Y*unpar - bpar*u2)
+         else
+            fcommon = uper(i)*fsd*Jnb**2
+            Yint(i) = 0.d0
+         endif
+         Xint(i) = fcommon*u*fsd
+      enddo
+
+      return
+      end
 
       subroutine absorp_collisional(tempe,dense,frqncy,zeff,
      & v_gr_perp,coll_mult,
