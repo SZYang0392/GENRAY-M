@@ -145,6 +145,7 @@ cSm070718      dimension u(6),deru(6),aux(8,6)
      +nrayelt_o_cutoff_emis,n0,igenray,
      +i_geom_optic_loc
       integer iintgr_err_nc(nraya,nfreqa)
+      integer iabsorplh_called_nc(nraya,nfreqa),iabs_called_any
 
 c-----externals
       external outpt
@@ -1185,6 +1186,7 @@ c      enddo
       do i=1,nraya
          do j=1,nfreqa
             iintgr_err_nc(i,j)=0
+            iabsorplh_called_nc(i,j)=0
          enddo
       enddo
 
@@ -1256,6 +1258,7 @@ CMPIINSERTPOSITION DETERMINERANK
      +              iray,ifreq,nray,myrank
        
       ifreq_write=ifreq ! to set in write.i
+      iabsorplh_called_one_ray=0
       iintgr_err_one_ray=0
 
 CWRITE       write(*,*)'genray.f ifreq_write',ifreq_write
@@ -1690,6 +1693,7 @@ c--------------------------------------------------------------
       else 
       iray_status_nc(iray,ifreq)=iray_status_one_ray
       endif  !i_bad_initial_conditions 
+      iabsorplh_called_nc(iray,ifreq)=iabsorplh_called_one_ray
       iintgr_err_nc(iray,ifreq)=iintgr_err_one_ray
       
 CMPIINSERTPOSITION SENDCONFIRM
@@ -1946,13 +1950,23 @@ c--------------------------------------------------------------------
 c--------------------------------------------------------------------
 c     print out status of absorplh integral convergence
 c--------------------------------------------------------------------
-         WRITE(*,*)'status of absorplh integral convergence'
+         iabs_called_any=0
          do iray=1,nrayl
          do ifreq=1,nfreq
-            WRITE(*,*)'iray,ifreq,iintgr_err_nc(iray,ifreq)',
+            if (iabsorplh_called_nc(iray,ifreq).eq.1) iabs_called_any=1
+         enddo
+         enddo
+         if (iabs_called_any.eq.1) then
+            WRITE(*,*)'status of absorplh integral convergence'
+            do iray=1,nrayl
+            do ifreq=1,nfreq
+               if (iabsorplh_called_nc(iray,ifreq).eq.1) then
+                  WRITE(*,*)'iray,ifreq,iintgr_err_nc(iray,ifreq)',
      +                 iray,ifreq,iintgr_err_nc(iray,ifreq)
-         enddo
-         enddo
+               endif
+            enddo
+            enddo
+         endif
 c-----------------------------------------------------------
 cSAP100111
 c-----------------------------------------------------------------        

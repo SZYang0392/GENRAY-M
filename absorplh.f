@@ -411,8 +411,8 @@ cSZYang0392 2026.3.21
             S2nx = Snx/2 + 4*H2nx - Hnx
             S2ny = Sny/2 + 4*H2ny - Hny
             ! Calculate the error and update data
-            Rnx = (S2nx - Snx)/15
-            Rny = (S2ny - Sny)/15
+            Rnx = S2nx - Snx
+            Rny = S2ny - Sny
             ifOKx = dabs(Rnx).lt.Reltol*dmax1(dabs(S2nx),1.d-30)
             ifOKy = dabs(Rny).lt.Reltol*dmax1(dabs(S2ny),1.d-30)
             if (ifOKx.and.ifOKy) exit

@@ -592,6 +592,7 @@ c                write(*,*)'LH maxw cnprim_e', cnprim_e
                 write(*,*)'and the subroutine absorplh will be used'
                 write(*,*)'for absorption calculations'
                 endif ! outprint
+                iabsorplh_called_one_ray=1
                 call absorplh(u,cnpar,cnper,temp_e,dens_e,tempiar
      1                  ,ifsd,Lambda0,DLambda,
      1                  bz,br,bphi,nbulk,bmod,frqncy,z_eff,
@@ -599,6 +600,7 @@ c                write(*,*)'LH maxw cnprim_e', cnprim_e
                 cnprim_cl=coll_mult*cnprim_cl  !BH191207
               endif
            else ! i.e., i_lsc_approach.ne.1
+              iabsorplh_called_one_ray=1
               call absorplh(u,cnpar,cnper,temp_e,dens_e,tempiar
      1                  ,ifsd,Lambda0,DLambda,
      1                  bz,br,bphi,nbulk,bmod,frqncy,z_eff,

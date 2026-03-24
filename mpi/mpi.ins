@@ -141,7 +141,7 @@ CMPIINSERTPOSITION SUBS
       integer myrank !In serial run: myrank=0; In MPI run: myrank=rank
       common/mpimyrank/myrank !In serial run: myrank=0; In MPI run: myrank=rank
      
-      parameter (li0=7) ! 7 scalar integers
+      parameter (li0=8) ! 8 scalar integers
       parameter (li2=nrelta*(n_relt_harm2a-n_relt_harm1a+1)) ! 2D int
       parameter (lc1=3*nrelta)  ! 1D complex*16
       parameter (lc3=9*nrelta)  ! 3D complex*16
@@ -233,7 +233,7 @@ c====================================================================
       integer ierr, tag, any_comm, src, mpi_index
       integer mpistatus(MPI_STATUS_SIZE)
       
-      parameter (li0=7) ! 7 scalar integers
+      parameter (li0=8) ! 8 scalar integers
       parameter (li2=nrelta*(n_relt_harm2a-n_relt_harm1a+1)) ! 2D int
       parameter (lc1=3*nrelta)  ! 1D complex*16
       parameter (lc3=9*nrelta)  ! 3D complex*16
