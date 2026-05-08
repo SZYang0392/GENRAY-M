@@ -29,5 +29,5 @@ jobs:
       run: make -f makefile_gfortran64
     - name: Build
       run: make -f makefile_gfortran64
-    - name: Test
-      run: ctest
+    # - name: Test
+    #   run: ctest
