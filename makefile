@@ -77,14 +77,14 @@ F90OBJS=	$(F90SRCS:.f90=.o)
 hostname:= $(shell echo $(HOSTNAME))
 ifeq ($(hostname),login110)
 	LOCATION= -L/usr/lib64  -L$(EBROOTPGPLOT) -L$(EBROOTNETCDF)/lib64 -L$(EBROOTOPENMPI)/lib
-	LIBRARIES=	$(LOCATION) 	-lX11 -lnetcdff -lnetcdf -lpgplot -lpng
+	LIBRARIES=	$(LOCATION) 	-lnetcdff -lnetcdf -lpgplot -lpng
 	INCLUDE= -I/usr/include/ -I$(EBROOTPGPLOT) -I$(EBROOTNETCDF)/include -I$(EBROOTOPENMPI)/include
 else
 	#!!! I have some problems with libpgplot.so file with lf95 compiler
 	#!!! Try copy libpgplot.a to libpgplot_lf95.a in /usr/local/pgplot dir and
 	#!!! uncomment next line (and comment previous one)
 	LOCATION= -L/usr/lib64  -L$(PGPLOT_DIR) -L$(NETCDF_ROOT)/lib -L$(MPI_ROOT)/lib
-	LIBRARIES=	$(LOCATION) 	-lX11 -lnetcdff -lnetcdf -lpgplot -lpng -lmpi_f90
+	LIBRARIES=	$(LOCATION) 	-lnetcdff -lnetcdf -lpgplot -lpng -lmpi_f90
 	#Location of netcdf.inc:
 	#Includes netcdf.inc and mpif.h(for mpi): Evidently need -I for each include.
 	INCLUDE= -I/usr/include/ -I$(PGPLOT_DIR) -I$(NETCDF_ROOT)/include -I$(MPI_ROOT)/include
