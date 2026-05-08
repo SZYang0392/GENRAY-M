@@ -25,8 +25,6 @@ jobs:
           sudo apt-get install -y libx11-dev
           # 如果将来提示找不到 netcdf 库，也可以顺便加在这里：
           # sudo apt-get install -y libnetcdff-dev libnetcdf-dev
-    - name: Build GENRAY
-      run: make -f makefile_gfortran64
     - name: Build
       run: make -f makefile_gfortran64
     # - name: Test
