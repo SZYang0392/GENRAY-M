@@ -19,6 +19,14 @@ jobs:
       run: sudo update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-9 9
     - name: Install deps
       run: sudo apt -y install nco netcdf-bin libnetcdff-dev pgplot5
+    - name: Install System Dependencies
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev
+          # 如果将来提示找不到 netcdf 库，也可以顺便加在这里：
+          # sudo apt-get install -y libnetcdff-dev libnetcdf-dev
+    - name: Build GENRAY
+      run: make -f makefile_gfortran64
     - name: Build
       run: make -f makefile_gfortran64
     - name: Test
