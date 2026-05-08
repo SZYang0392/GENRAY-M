@@ -813,9 +813,11 @@ c-----locals
          d_eps_par_d_x_ar(i)  = -1.d0
          d_eps_xy_d_x_ar(i)   = -y_ar(i)/(1-y_ar(i)**2) 
 
-         d_eps_perp_d_y_ar(i) = -2.d0*x_ar(i)*y_ar(i)/((1-y_ar(i)**2)**2)  
+         d_eps_perp_d_y_ar(i) = -2.d0*x_ar(i)*y_ar(i)/
+     &    ((1-y_ar(i)**2)**2)  
          d_eps_par_d_y_ar(i)  = 0.d0
-         d_eps_xy_d_y_ar(i)   = -x_ar(i)*(1+y_ar(i)**2)/((1-y_ar(i)**2)**2)  
+         d_eps_xy_d_y_ar(i)   = -x_ar(i)*(1+y_ar(i)**2)/
+     &    ((1-y_ar(i)**2)**2)  
       enddo !nbulk
 
       d_eps_par_dr=0.d0

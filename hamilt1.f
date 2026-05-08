@@ -456,6 +456,29 @@ c     &   d_D_0_d_n_perp)
 
       endif
 c**  end if id=16
+c------------------------------------------------------------
+c     [SZYang] Cold ES dispersion for LH wave   
+      if (id.eq.17) then
+
+            cnt=cn(r,cnz,cnr,cm)
+            cnpar=cnt*dc
+            cnper=cnt*ds
+   
+            sss = 1
+            ppp = 1
+
+            do i=1,nbulk
+                  x_ar(i)=x(z,r,phi,i)
+                  y_ar(i)=y(z,r,phi,i)
+                  sss = sss - x_ar(i)/(1 - y_ar(i)**2)
+                  ppp = ppp - x_ar(i)
+            enddo
+   
+            hamilt1 = (cnpar**2 + cnper**2)
+            hamilt1 = hamilt1 * (sss*cnper**2 + ppp*cnpar**2)
+   
+         endif
+c**  end if id=17
 
  10   continue
       return
